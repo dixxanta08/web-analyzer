@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import InputSection from "./components/InputSection";
 import LoadingSection from "./components/LoadingSection";
 import ThemeToggle from "./components/ThemeToggle";
@@ -41,7 +41,6 @@ const API_KEY = import.meta.env.VITE_GOOGLE_PAGE_API_KEY;
 export default function PerformanceDashboard() {
   const [data, setData] = useState<PerformanceData | null>(null);
 
-  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<
     "loading" | "success" | "error" | "idle"
   >("idle");
@@ -128,8 +127,6 @@ export default function PerformanceDashboard() {
     } catch (e: any) {
       setStatus("error");
       setError(e.message || "Unknown error");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -179,34 +176,43 @@ export default function PerformanceDashboard() {
       header: "Percentage",
       align: "right" as const,
       render: (value: number, row: any) => {
+        console.log("Value:", value);
         const totalSize =
           data?.contentSizeByType.reduce(
-            (sum: number, i: any) => sum + i.size,
+            (sum: number, item: any) => sum + item.size,
             0
-          ) || 0;
-        const percent =
-          totalSize > 0 ? ((row.size / totalSize) * 100).toFixed(0) : "0";
+          ) || 1; // Avoid division by zero
+
+        const percent = Math.round((row.size / totalSize) * 100);
+        const percentString = `${percent}`;
+
+        const getBarColor = (resourceType: string): string => {
+          switch (resourceType) {
+            case "image":
+              return "bg-blue-500";
+            case "script":
+              return "bg-green-500";
+            case "stylesheet":
+              return "bg-purple-500";
+            case "document":
+              return "bg-orange-500";
+            default:
+              return "bg-gray-500";
+          }
+        };
 
         return (
           <div className="flex items-center justify-end space-x-3">
             <div className="w-32 h-3 bg-base-300 rounded-full overflow-hidden">
               <div
-                className={`h-3 rounded-full transition-all duration-300 ${
-                  row.resourceType === "image"
-                    ? "bg-blue-500"
-                    : row.resourceType === "script"
-                    ? "bg-green-500"
-                    : row.resourceType === "stylesheet"
-                    ? "bg-purple-500"
-                    : row.resourceType === "document"
-                    ? "bg-orange-500"
-                    : "bg-gray-500"
-                }`}
+                className={`h-3 rounded-full transition-all duration-300 ${getBarColor(
+                  row.resourceType
+                )}`}
                 style={{ width: `${percent}%` }}
               ></div>
             </div>
             <span className="text-sm text-base-content/70 font-semibold min-w-[3rem]">
-              {percent}%
+              {percentString}%
             </span>
           </div>
         );
