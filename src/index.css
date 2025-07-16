@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+  --font-default: "Inter", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-default);
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
