@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [tailwindcss(), react()],
-  base: "/web-analyzer/",
+  base: "./",
   optimizeDeps: {
     include: ["react", "react-dom", "react-icons/ri"],
   },
